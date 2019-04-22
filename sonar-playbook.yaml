@@ -1,0 +1,88 @@
+- hosts: 3.86.253.93
+  tasks:
+    - name: Create the sonar user for running the SonarQube services
+      sudo: true
+      user:
+        name: sonar
+    - name: Download SonarQube
+      get_url:
+        url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-6.7.7.zip"
+        dest: "/home/ubuntu/sonarqube-6.7.7.zip"
+
+    - name: Extract SonarQube
+      sudo: true
+      unarchive:
+        src: "/home/ubuntu/sonarqube-6.7.7.zip"
+        dest: "/home/ubuntu/"
+        copy: no
+        owner: sonar
+
+    - name: Link this version of sonarqube as the server SonarQube version
+      sudo: true
+      file:
+        src: "/home/ubuntu/sonarqube-6.7.7"
+        dest: "/home/ubuntu/sonarqube"
+        state: link
+        owner: sonar
+
+    - name: Configure SonarQube DB username
+      sudo: true
+      lineinfile:
+        path: "/home/ubuntu/sonarqube/conf/sonar.properties"
+        regexp: "^sonar.jdbc.username="
+        insertafter: "^#sonar.jdbc.username="
+        line: "sonar.jdbc.username=root"
+
+    - name: Configure SonarQube DB password
+      sudo: true
+      lineinfile:
+        path: "/home/ubuntu/sonarqube/conf/sonar.properties"
+        regexp: "^sonar.jdbc.password="
+        insertafter: "^#sonar.jdbc.password="
+        line: "sonar.jdbc.password=root"
+
+    - name: Configure SonarQube DB connection string
+      sudo: true
+      lineinfile:
+        path: "/home/ubuntu/sonarqube/conf/sonar.properties"
+        regexp: "sonar.jdbc.url=jdbc mysql://localhost:3306/sonarqube?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false"
+        insertafter: "^#sonar.jdbc.url=jdbc:mysql://localhost:3306/sonarqube?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false"
+        line: "sonar.jdbc.url=jdbc:mysql://localhost:3306/sonarqube?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false"
+
+    - name: Configure SonarQube Host
+      sudo: true
+      lineinfile:
+        path: "/home/ubuntu/sonarqube/conf/sonar.properties"
+        regexp: "^sonar.web.host=0.0.0.0"
+        insertafter: "^#sonar.web.host=0.0.0.0"
+        line: "sonar.web.host=0.0.0.0"
+    - name: Configure SonarQube Port
+      sudo: true
+      lineinfile:
+        path: "/home/ubuntu/sonarqube/conf/sonar.properties"
+        regexp: "^sonar.web.port=8080"
+        insertafter: "^#sonar.web.port=8080"
+        line: "sonar.web.port=8080"
+
+    - name: Configure SonarQube to run as the sonar user
+      sudo: true
+      lineinfile:
+        path: "/home/ubuntu/sonarqube/bin/linux-x86-64/sonar.sh"
+        regexp: "RUN_AS_USER=sonar"
+        insertafter: "#RUN_AS_USER="
+        line: "RUN_AS_USER=sonar"
+
+    - name: Copy the SonarQube service configuration file
+      sudo: true
+      copy:
+        src: "./sonarqube.service"
+        dest: "/etc/systemd/system/sonarqube.service"
+
+
+    - name: Enable the SonarQube service
+      sudo: true
+      systemd:
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        name: sonarqube

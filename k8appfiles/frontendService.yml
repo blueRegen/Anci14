@@ -1,0 +1,35 @@
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: frontendservice
+  namespace: kube-system
+spec:
+  type: ExternalName
+  externalName: ec2-3-8-18-120.eu-west-2.compute.amazonaws.com
+spec:
+  selector:
+    app: frontendDeployment
+  ports:
+  - name: node
+    protocol: TCP
+    port: 4200
+    targetPort: 4200
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+  namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: yushh.website
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: frontendservice
+          servicePort: node

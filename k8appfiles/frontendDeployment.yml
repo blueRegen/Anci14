@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: frontendDeployment
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%
+  template:
+    metadata:
+      labels:
+        app: frontendDeployment
+    spec:
+      containers:
+      - name: node
+        image: 342347373179.dkr.ecr.us-east-1.amazonaws.com/docker-php-symfony-angular_node:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4200
+        resources:
+          requests:
+            cpu: 200m
+        command: ["/bin/bash"]
+        args: ["-c", "cd frontend && npm install && ng serve --host 0.0.0.0 --disableHostCheck true"]
+      imagePullSecrets: 
+      - name: my-docker-credentials    
