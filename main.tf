@@ -413,7 +413,7 @@ apt install -y python zip
 curl -O https://bootstrap.pypa.io/get-pip.py
 python get-pip.py
 pip install awscli
-curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/201n/linux/amd64/aws-iam-authenticator
+curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.12.7/2019-03-27/bin/linux/amd64/aws-iam-authenticator
 chmod +x ./aws-iam-authenticator
 cp ./aws-iam-authenticator /usr/local/bin
 curl -O https://raw.githubusercontent.com/spinnaker/halyard/master/install/debian/Inrd.sh
