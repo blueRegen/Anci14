@@ -1,4 +1,4 @@
-- hosts: 3.86.253.93
+- hosts: all
   tasks:
     - name: Create the sonar user for running the SonarQube services
       sudo: true
