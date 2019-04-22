@@ -1,5 +1,5 @@
 ---
-- hosts: 3.86.253.93
+- hosts: all
   vars:
     mysql_root_password: root
   tasks:
